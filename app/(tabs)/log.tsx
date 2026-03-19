@@ -14,6 +14,7 @@ import Body from 'react-native-body-highlighter';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Colors } from '../../src/constants/colors';
 import { insertWorkout } from '../../src/db/queries';
+import { MuscleChip } from '../../src/components/MuscleChip';
 
 type BodyPart = { slug: string; intensity?: number };
 
@@ -134,10 +135,19 @@ export default function LogWorkoutScreen() {
         />
       </View>
 
-      {selectedMuscles.length > 0 && (
-        <Text style={styles.selectedHint}>
-          {selectedMuscles.length} muscle{selectedMuscles.length > 1 ? 's' : ''} selected — tap to deselect
-        </Text>
+      {selectedMuscles.length > 0 ? (
+        <View style={styles.selectedChips}>
+          {selectedMuscles.map((m) => (
+            <MuscleChip
+              key={m.slug}
+              muscle={m.slug}
+              selected
+              onRemove={() => handleBodyPartPress({ slug: m.slug })}
+            />
+          ))}
+        </View>
+      ) : (
+        <Text style={styles.selectedHint}>Tap muscles to select</Text>
       )}
 
       {/* Notes */}
@@ -253,6 +263,13 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: Colors.textSecondary,
     textAlign: 'center',
+    marginTop: 10,
+  },
+  selectedChips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    justifyContent: 'center',
     marginTop: 10,
   },
   saveBtn: {
