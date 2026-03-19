@@ -26,17 +26,20 @@ export default function HistoryScreen() {
   const [workouts, setWorkouts] = useState<WorkoutWithMuscles[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const data = await getAllWorkouts();
-      setWorkouts(data);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useFocusEffect(load);
+  useFocusEffect(
+    useCallback(() => {
+      async function load() {
+        setLoading(true);
+        try {
+          const data = await getAllWorkouts();
+          setWorkouts(data);
+        } finally {
+          setLoading(false);
+        }
+      }
+      load();
+    }, [])
+  );
 
   function confirmDelete(id: number) {
     Alert.alert('Delete workout', 'Are you sure?', [

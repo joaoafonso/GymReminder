@@ -40,16 +40,19 @@ export default function SettingsScreen() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      setReminders(await getAllReminders());
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useFocusEffect(load);
+  useFocusEffect(
+    useCallback(() => {
+      async function load() {
+        setLoading(true);
+        try {
+          setReminders(await getAllReminders());
+        } finally {
+          setLoading(false);
+        }
+      }
+      load();
+    }, [])
+  );
 
   async function handleToggle(id: number, enabled: boolean) {
     await updateReminder(id, { enabled: enabled ? 1 : 0 });
@@ -114,7 +117,7 @@ export default function SettingsScreen() {
       });
       setShowForm(false);
       resetForm();
-      await load();
+      setReminders(await getAllReminders());
       scheduleReminders();
     } finally {
       setSaving(false);

@@ -26,60 +26,63 @@ export default function DashboardScreen() {
   const [recentMuscles, setRecentMuscles] = useState<string[]>([]);
   const [reminderStatuses, setReminderStatuses] = useState<ReminderStatus[]>([]);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [lastDate, reminders, workouts] = await Promise.all([
-        getLastWorkoutDate(),
-        getAllReminders(),
-        getAllWorkouts(),
-      ]);
+  useFocusEffect(
+    useCallback(() => {
+      async function load() {
+        setLoading(true);
+        try {
+          const [lastDate, reminders, workouts] = await Promise.all([
+            getLastWorkoutDate(),
+            getAllReminders(),
+            getAllWorkouts(),
+          ]);
 
-      setLastWorkoutDate(lastDate);
+          setLastWorkoutDate(lastDate);
 
-      // Most recent workout's muscles
-      if (workouts.length > 0) {
-        setRecentMuscles(workouts[0].muscles);
-      } else {
-        setRecentMuscles([]);
-      }
+          // Most recent workout's muscles
+          if (workouts.length > 0) {
+            setRecentMuscles(workouts[0].muscles);
+          } else {
+            setRecentMuscles([]);
+          }
 
-      // Evaluate each reminder
-      const today = new Date();
-      const statuses: ReminderStatus[] = [];
+          // Evaluate each reminder
+          const today = new Date();
+          const statuses: ReminderStatus[] = [];
 
-      for (const r of reminders) {
-        if (!r.enabled) continue;
+          for (const r of reminders) {
+            if (!r.enabled) continue;
 
-        let lastDateStr: string | null = null;
-        if (r.type === 'inactivity') {
-          lastDateStr = lastDate;
-        } else if (r.muscle) {
-          lastDateStr = await getLastMuscleDate(r.muscle);
+            let lastDateStr: string | null = null;
+            if (r.type === 'inactivity') {
+              lastDateStr = lastDate;
+            } else if (r.muscle) {
+              lastDateStr = await getLastMuscleDate(r.muscle);
+            }
+
+            let daysSince: number | null = null;
+            if (lastDateStr) {
+              const diff = today.getTime() - new Date(lastDateStr).getTime();
+              daysSince = Math.floor(diff / (1000 * 60 * 60 * 24));
+            }
+
+            const overdue = daysSince === null || daysSince >= r.thresholdDays;
+            const label =
+              r.type === 'inactivity'
+                ? 'General activity'
+                : getMuscleLabel(r.muscle ?? '');
+
+            statuses.push({ id: r.id, label, daysSince, threshold: r.thresholdDays, overdue });
+          }
+
+          setReminderStatuses(statuses);
+        } finally {
+          setLoading(false);
         }
-
-        let daysSince: number | null = null;
-        if (lastDateStr) {
-          const diff = today.getTime() - new Date(lastDateStr).getTime();
-          daysSince = Math.floor(diff / (1000 * 60 * 60 * 24));
-        }
-
-        const overdue = daysSince === null || daysSince >= r.thresholdDays;
-        const label =
-          r.type === 'inactivity'
-            ? 'General activity'
-            : getMuscleLabel(r.muscle ?? '');
-
-        statuses.push({ id: r.id, label, daysSince, threshold: r.thresholdDays, overdue });
       }
-
-      setReminderStatuses(statuses);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useFocusEffect(load);
+      load();
+    }, [])
+  );
 
   const daysSinceLastWorkout = lastWorkoutDate
     ? Math.floor((new Date().getTime() - new Date(lastWorkoutDate).getTime()) / 86_400_000)
