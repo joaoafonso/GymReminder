@@ -2,7 +2,7 @@ import * as BackgroundFetch from 'expo-background-fetch';
 import * as TaskManager from 'expo-task-manager';
 import { scheduleReminders } from './scheduler';
 
-const TASK_NAME = 'gymreminder-background-check';
+const TASK_NAME = 'musclememo-background-check';
 
 TaskManager.defineTask(TASK_NAME, async () => {
   try {

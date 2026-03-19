@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "GymReminder",
-    "slug": "gymreminder",
-    "scheme": "gymreminder",
+    "name": "MuscleMemo",
+    "slug": "musclememo",
+    "scheme": "musclememo",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -27,7 +27,7 @@
         "android.permission.RECEIVE_BOOT_COMPLETED",
         "android.permission.WAKE_LOCK"
       ],
-      "package": "com.anonymous.gymreminder"
+      "package": "com.anonymous.musclememo"
     },
     "web": {
       "favicon": "./assets/favicon.png"

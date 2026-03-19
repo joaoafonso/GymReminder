@@ -98,7 +98,7 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.heading}>GymReminder</Text>
+      <Text style={styles.heading}>MuscleMemo</Text>
 
       {/* Last workout card */}
       <View style={styles.card}>
